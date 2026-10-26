@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Build Koan.app
+        run: scripts/build-app.sh release
+
+      - name: Package
+        run: ditto -c -k --keepParent build/Koan.app build/Koan-macOS.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Koan-macOS
+          path: build/Koan-macOS.zip
